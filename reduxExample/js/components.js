@@ -11,12 +11,12 @@ const topics = () => {
      *  기본적으로 쉼표(,) 로 묶어서 리턴한다는군요.*/
 
     const state = store.getState();
-    const list = state.contents;
-    const lists = list.map( (v, idx) => `<li><button type="button">${state.contents[idx].title}</button></li>`).join('');
+    const lists = state.contents;
+    const list = lists.map( (v, idx) => `<li><button type="button">${state.contents[idx].title}</button></li>`).join('');
 
-    console.log(state);
+    console.log(lists);
     document.getElementById('topics')
-        .innerHTML =`<ol>${lists}</ol>`;
+        .innerHTML =`<ol>${list}</ol>`;
 
     document.querySelectorAll('#topics button').forEach((button, key) => {
         button.addEventListener('click', e => {
@@ -25,7 +25,6 @@ const topics = () => {
                 id:state.contents[key].id
             };
             store.dispatch(action);
-            console.log(state.action)
         })
     })
 }
@@ -57,7 +56,6 @@ const controls = () => {
 
 const content = () => {
     const state = store.getState();
-    console.log('contentMode', state.mode);
 
     if(state.mode === 'read'){
         const aTitle = state.contents.map( (v) => v.id === state.selcted_id ? v.title : null).join('');
@@ -90,8 +88,8 @@ const content = () => {
                 </article>
             `;
 
-        const form = document.querySelector('.js-form');
-        form.addEventListener('submit', e => {
+        const $form = document.querySelector('.js-form');
+        $form.addEventListener('submit', e => {
             e.preventDefault();
             const _title = e.target.title.value;
             const _desc = e.target.desc.value;

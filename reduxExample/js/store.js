@@ -42,7 +42,7 @@ function reducer(state, action){
         newState = Object.assign({},state,
             {
                 max_id: newMaxId,
-                content: newContents,
+                contents: newContents,
                 mode: 'read'
             }
         );
