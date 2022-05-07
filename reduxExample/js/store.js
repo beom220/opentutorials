@@ -57,9 +57,12 @@ function reducer(state, action){
             contents : newContents
         })
     }
-    // TODO UPDATE ...
+    // UPDATE ...
     if(action.type === 'UPDATE'){
-        console.log('actionType : update');
+        const newContents = state.contents.concat();
+        newContents[action.id -1] = Object.assign({}, newContents[action.id -1], {desc: action.desc, title: action.title});
+        // newContents[action.id -1] = {...newContents[action.id -1], desc: action.desc, title: action.title};
+        newState = Object.assign({}, state, {mode : 'read', contents: newContents});
     }
     // CHANGE_MODE ...
     if(action.type === 'CHANGE_MODE') {

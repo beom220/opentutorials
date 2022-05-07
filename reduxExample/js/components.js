@@ -49,7 +49,7 @@ const controls = () => {
                         }
                         break;
                     case 'js-update' :
-                        alert('Update');
+                        store.dispatch({ type: 'CHANGE_MODE', mode: 'update'})
                         break;
                     default : console.log('button case undefined');
                 }
@@ -72,6 +72,33 @@ const controls = () => {
 
 const content = () => {
     const state = store.getState();
+
+    const onSubmit = () => {
+        const $form = document.querySelector('.js-form');
+        $form.addEventListener('submit', e => {
+            e.preventDefault();
+            const _title = e.target.title.value;
+            const _desc = e.target.desc.value;
+
+            if(_title === '') alert('we need title');
+            else if(_desc === '') alert('we need description');
+            else if(state.mode === 'create'){
+                store.dispatch({
+                    type : 'CREATE',
+                    title : _title,
+                    desc : _desc
+                })
+            }else if(state.mode === 'update'){
+                const action = {
+                    type: 'UPDATE',
+                    id: state.selcted_id,
+                    title : _title,
+                    desc : _desc
+                };
+                store.dispatch(action);
+            }
+        })
+    };
 
     if(state.mode === 'welcome'){
         document.getElementById('content')
@@ -112,26 +139,27 @@ const content = () => {
                     </form>
                 </article>
             `;
-
-        const $form = document.querySelector('.js-form');
-        $form.addEventListener('submit', e => {
-            e.preventDefault();
-            const _title = e.target.title.value;
-            const _desc = e.target.desc.value;
-
-            if(_title === '') alert('we need title');
-            else if(_desc === '') alert('we need description');
-            else {
-                store.dispatch({
-                    type : 'CREATE',
-                    title : _title,
-                    desc : _desc
-                })
-            }
-        })
+        onSubmit();
     }
     if(state.mode === 'update'){
-
+        const content = state.contents[state.selcted_id - 1];
+        document.getElementById('content')
+            .innerHTML = `
+                <article>
+                    <form class="js-form">
+                        <p>
+                            <input type="text" name="title" placeholder="title" value="${content.title}">
+                        </p>
+                        <p>
+                            <textarea name="desc" placeholder="description">${content.desc}</textarea>
+                        </p>
+                        <p>
+                            <input type="submit">
+                        </p>
+                    </form>
+                </article>
+            `;
+        onSubmit();
     }
 }
 
