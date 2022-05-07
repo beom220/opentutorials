@@ -11,18 +11,18 @@ const _contents = [
 
 function reducer(state, action){
 
-    // INITIALIZE
+    // INITIALIZE ...
     if(state === undefined) {
         return  {
             max_id : 2,
-            mode : 'create',
+            mode : 'read',
             selcted_id : 2,
             contents : _contents,
         }
     }
 
     let newState = {};
-    // READ
+    // READ ...
     if(action.type === 'SELECT'){
         newState = Object.assign(
             {},
@@ -33,23 +33,29 @@ function reducer(state, action){
             }
         );
     }
-    // TODO CREATE ...
+    // CREATE ...
     if(action.type === 'CREATE'){
         const newMaxId = state.max_id + 1;
         const newContents = state.contents.concat();
-        console.log(newState);
         newContents.push({id: newMaxId,title: action.title,desc: action.desc});
         newState = Object.assign({},state,
             {
                 max_id: newMaxId,
+                mode: 'read',
+                selcted_id : newMaxId,
                 contents: newContents,
-                mode: 'read'
             }
         );
     }
     // TODO REMOVE ...
     if(action.type === 'REMOVE'){
         console.log('actionType : remove');
+    }
+    // CHANGE_MODE ...
+    if(action.type === 'CHANGE_MODE') {
+        newState = Object.assign({}, state, {
+            mode: action.mode
+        });
     }
     console.log(newState);
     return newState;

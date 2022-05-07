@@ -43,7 +43,7 @@ const controls = () => {
 
             switch (e.target.className){
                 case 'js-add' :
-                    console.log('add');
+                    store.dispatch({ type: 'CHANGE_MODE', mode: 'create'})
                     break;
                 case 'js-remove' :
                     console.log('remove');
@@ -93,12 +93,18 @@ const content = () => {
             e.preventDefault();
             const _title = e.target.title.value;
             const _desc = e.target.desc.value;
-            console.log(_title, _desc);
-            store.dispatch({
-                type : 'CREATE',
-                title : _title,
-                desc : _desc
-            })
+
+            if(_title === ''){
+                alert('we need title');
+            }else if(_desc === ''){
+                alert('we need description')
+            } else {
+                store.dispatch({
+                    type : 'CREATE',
+                    title : _title,
+                    desc : _desc
+                })
+            }
         })
     }
     if(state.mode === 'welcome'){
@@ -109,15 +115,6 @@ const content = () => {
                 </article>
             `;
     }
-    // else {
-    //     document.getElementById('content')
-    //         .innerHTML = `
-    //             <article>
-    //                 <p>에러...</p>
-    //             </article>
-    //         `;
-    // }
-
 }
 
 export { subject, topics, controls, content };
