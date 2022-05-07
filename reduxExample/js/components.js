@@ -6,7 +6,7 @@ const subject = () => {
 }
 
 const topics = () => {
-    /*FIXME
+    /*NOTE
      *  map 함수가 문자열 형태로 값을 리턴할 때는 (template literals로 결합한 내용도 문자열 형태로 리턴되는 값이죠)
      *  기본적으로 쉼표(,) 로 묶어서 리턴한다는군요.*/
 
@@ -31,6 +31,8 @@ const topics = () => {
 }
 
 const controls = () => {
+    const state = store.getState();
+
     document.getElementById('control')
         .innerHTML =`
             <li><button class="js-add">추가</button></li>
@@ -39,7 +41,7 @@ const controls = () => {
 
     document.querySelectorAll('#control button').forEach(button => {
         button.addEventListener('click', e => {
-            // console.log(e.target.className);
+
             switch (e.target.className){
                 case 'js-add' :
                     console.log('add');
@@ -55,11 +57,12 @@ const controls = () => {
 
 const content = () => {
     const state = store.getState();
+    console.log('contentMode', state.mode);
 
     if(state.mode === 'read'){
         const aTitle = state.contents.map( (v) => v.id === state.selcted_id ? v.title : null).join('');
         const aDesc = state.contents.map( (v) => v.id === state.selcted_id ? v.desc : null).join('');
-
+        console.log(aTitle)
         document.getElementById('content')
             .innerHTML = `
                 <article>
@@ -73,7 +76,7 @@ const content = () => {
         document.getElementById('content')
             .innerHTML = `
                 <article>
-                    <form>
+                    <form class="js-form">
                         <p>
                             <input type="text" name="title" placeholder="title">
                         </p>
@@ -86,15 +89,36 @@ const content = () => {
                     </form>
                 </article>
             `;
+
+        const form = document.querySelector('.js-form');
+        form.addEventListener('submit', e => {
+            e.preventDefault();
+            const _title = e.target.title.value;
+            const _desc = e.target.desc.value;
+            console.log(_title, _desc);
+            store.dispatch({
+                type : 'CREATE',
+                title : _title,
+                desc : _desc
+            })
+        })
     }
-    else {
+    if(state.mode === 'welcome'){
         document.getElementById('content')
             .innerHTML = `
                 <article>
-                    <p>hi</p>
+                    <p>안녕하세요</p>
                 </article>
             `;
     }
+    // else {
+    //     document.getElementById('content')
+    //         .innerHTML = `
+    //             <article>
+    //                 <p>에러...</p>
+    //             </article>
+    //         `;
+    // }
 
 }
 
