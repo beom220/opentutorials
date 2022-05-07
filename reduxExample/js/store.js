@@ -15,7 +15,7 @@ function reducer(state, action){
     if(state === undefined) {
         return  {
             max_id : 2,
-            mode : 'read',
+            mode : 'welcome',
             selcted_id : 2,
             contents : _contents,
         }
@@ -47,9 +47,19 @@ function reducer(state, action){
             }
         );
     }
-    // TODO REMOVE ...
+    // REMOVE ...
     if(action.type === 'REMOVE'){
-        console.log('actionType : remove');
+        const newMaxId = state.max_id - 1;
+        const newContents = state.contents.filter(v => v.id !== state.selcted_id);
+        newState = Object.assign({}, state, {
+            max_id: newMaxId,
+            mode: 'welcome',
+            contents : newContents
+        })
+    }
+    // TODO UPDATE ...
+    if(action.type === 'UPDATE'){
+        console.log('actionType : update');
     }
     // CHANGE_MODE ...
     if(action.type === 'CHANGE_MODE') {
@@ -57,7 +67,6 @@ function reducer(state, action){
             mode: action.mode
         });
     }
-    console.log(newState);
     return newState;
 }
 
