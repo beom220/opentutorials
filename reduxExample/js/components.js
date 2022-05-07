@@ -32,39 +32,38 @@ const controls = () => {
     const btnEvent = () => {
         document.querySelectorAll('#control button').forEach(button => {
             button.addEventListener('click', e => {
-                switch (e.target.className){
-                    case 'js-add' :
-                        store.dispatch({ type: 'CHANGE_MODE', mode: 'create'})
-                        break;
-                    case 'js-remove' :
-                        if(state.mode !== 'read'){
-                            alert('not read');
+                if(e.target.classList.contains('js-add')){
+                    store.dispatch({ type: 'CHANGE_MODE', mode: 'create'})
+                }
+                if(e.target.classList.contains('js-remove')){
+                    if(state.mode !== 'read'){
+                        alert('not read');
+                    }
+                    if(state.mode === 'read'){
+                        if(confirm('Are you sure remove this?')){
+                            store.dispatch({ type: 'REMOVE', mode: 'delete'})
+                        }else {
+                            alert('Remove cancel')
                         }
-                        if(state.mode === 'read'){
-                            if(confirm('Are you sure remove this?')){
-                                store.dispatch({ type: 'REMOVE', mode: 'delete'})
-                            }else {
-                                alert('Remove cancel')
-                            }
-                        }
-                        break;
-                    case 'js-update' :
-                        store.dispatch({ type: 'CHANGE_MODE', mode: 'update'})
-                        break;
-                    default : console.log('button case undefined');
+                    }
+                }
+                if(e.target.classList.contains('js-update')){
+                    store.dispatch({ type: 'CHANGE_MODE', mode: 'update'})
                 }
             });
         });
     };
 
     if(state.mode !== 'read'){
-        document.getElementById('control').innerHTML =`<li><button class="js-add">작성</button></li>`;
+        document.getElementById('control').innerHTML =`<ul><li><button class="primary js-add">글쓰기</button></li></ul>`;
     }
     if(state.mode === 'read'){
         document.getElementById('control').innerHTML =`
-            <li><button class="js-add">작성</button></li>
-            <li><button class="js-remove">삭제</button></li>
-            <li><button class="js-update">수정</button></li>
+            <ul>
+                <li><button class="primary js-add">글쓰기</button></li>
+                <li><button class="secondary js-update">수정</button></li>
+                <li><button class="danger js-remove">삭제</button></li>
+            </ul>
         `;
     }
     btnEvent();
@@ -104,7 +103,10 @@ const content = () => {
         document.getElementById('content')
             .innerHTML = `
                 <article>
-                    <p>안녕하세요</p>
+                    <h2>Welcome</h2>
+                    <p>
+                        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ab enim ipsam laudantium natus similique! Architecto doloremque dolorum ipsam minima molestiae?
+                    </p>
                 </article>
             `;
     }

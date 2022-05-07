@@ -1,0 +1,90 @@
+@use "variable";
+
+#subject {
+  padding: 0 1.25rem;
+  margin-bottom: 3rem;
+  span { font-size: 1.25rem }
+}
+
+#topics {
+  li {
+    margin: .625rem;
+    list-style: inside;
+
+    button {
+      font-size: 1.625rem;
+      &:hover, &:focus {color: dodgerblue;}
+    }
+  }
+}
+
+#content {
+  margin: 1.25rem;
+  padding: 1.25rem;
+  border: 2px solid #bdbdbd;
+  border-radius: .625rem;
+  box-shadow:  0 1px 6px 0 #eeeeee;
+  //box-shadow: 0 1px 6px 0 rgba(32, 33, 36, .28);
+
+  h2 {
+    padding: 0;
+    margin: 0 0 .625rem;
+  }
+
+  input, textarea {
+    border: 1px solid #eee;
+    border-radius: .275rem;
+    padding: .625rem .325rem;
+    width: 100%;
+    resize: none;
+    &:focus {
+      outline: none;
+      box-shadow:  0 1px 2px 0 #eeeeee;
+    }
+  }
+  textarea{
+    height: 8rem;
+  }
+
+  input[type='submit']{
+    color: #fff;
+    background-color: variable.$primary-color;
+    &:hover, &:focus {background-color : variable.$primary-hover;}
+  }
+}
+
+#control {
+  margin-top : 1.25rem;
+  padding: 0 1.25rem;
+  ul {
+    display: flex;
+    justify-content: flex-end;
+    li {
+      margin: 0 .275rem;
+
+      button {
+        font-size: 13px;
+        border: 0;
+        padding: .375rem 1.625rem;
+      }
+    }
+  }
+}
+
+
+button {
+  &.primary {
+    color: #fff;
+    background-color: variable.$primary-color;
+    &:hover, &:focus {background-color : variable.$primary-hover;}
+  }
+  &.secondary {
+    background-color: variable.$secondary-color;
+    &:hover, &:focus {background-color : variable.$secondary-hover;}
+  }
+  &.danger {
+    color: #fff;
+    background-color: variable.$danger-color;
+    &:hover, &:focus  {background-color : variable.$danger-hover;}
+  }
+}

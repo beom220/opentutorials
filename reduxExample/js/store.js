@@ -5,8 +5,16 @@
 const createStore = Redux.createStore;
 
 const _contents = [
-    {id:1,title:'HTML',desc:'HTML is ..'},
-    {id:2,title:'CSS', desc:'CSS is ..'}
+    {
+        id: 1,
+        title: 'Lorem ipsum dolor sit amet,',
+        desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam in consectetur ante. Sed condimentum orci et lectus sagittis, ut sodales nisi imperdiet. Nulla facilisi. Maecenas mattis massa sed enim malesuada, in maximus justo efficitur. Donec vel risus hendrerit, posuere lorem id, volutpat ante. Donec in sem eget nisl posuere accumsan ac eu ligula. Vestibulum sit amet felis sit amet nulla lacinia blandit ut vel tellus. Pellentesque mollis fermentum egestas. Aenean non elit at ligula semper ornare. Morbi pellentesque neque sed lacus faucibus efficitur. Praesent eu nisi a dolor fringilla tincidunt condimentum id est. Nulla facilisi. Etiam sagittis, justo sed efficitur maximus, arcu dolor dignissim justo, ac interdum magna massa in orci. Pellentesque hendrerit erat magna, vel porttitor enim tempor ut.'
+    },
+    {
+        id: 2,
+        title: 'quis tincidunt dapibus.',
+        desc: 'Donec pharetra diam risus, non aliquet tellus vehicula a. Donec finibus aliquam purus sed sagittis. Curabitur pharetra metus nec ex ultrices vulputate. Nunc sed tortor mauris. Proin sed arcu magna. Praesent ac feugiat leo. Mauris condimentum felis quis tincidunt dapibus. Aenean ac dolor vel odio sagittis auctor quis sed turpis. Sed sed orci turpis. Interdum et malesuada fames ac ante ipsum primis in faucibus. Vivamus consequat vulputate sapien quis ultrices. Quisque auctor euismod euismod. Duis magna enim, laoreet et enim sit amet, dapibus aliquam massa. Nullam vel enim elementum, molestie tellus et, mattis nunc. Cras nec euismod lorem.'
+    },
 ]
 
 function reducer(state, action){
