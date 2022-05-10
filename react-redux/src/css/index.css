@@ -1,0 +1,30 @@
+.App {
+  border: 20px solid green;
+  color: #333;
+  padding: 16px;
+}
+.App div {
+  margin: 16px 0;
+}
+.App .addNumberRoot {
+  border: 2px solid navy;
+  color: #333;
+  padding: 16px;
+}
+.App .addNumberRoot .addNumber {
+  border: 2px solid red;
+  color: #333;
+  padding: 16px;
+}
+.App .displayNumberRoot {
+  border: 2px solid navy;
+  color: #333;
+  padding: 16px;
+}
+.App .displayNumberRoot .displayNumber {
+  border: 2px solid red;
+  color: #333;
+  padding: 16px;
+}
+
+/*# sourceMappingURL=index.css.map */
