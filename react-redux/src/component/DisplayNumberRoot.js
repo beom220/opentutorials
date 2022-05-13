@@ -1,4 +1,3 @@
-import {useState} from "react";
 import DisplayNumber from "./DisplayNumber";
 
 export default function DisplayNumberRoot(props){

@@ -1,5 +1,3 @@
-import {useState} from "react";
-
 export default function DisplayNumber(props){
     return (
         <div className="displayNumber">
