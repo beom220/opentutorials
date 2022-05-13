@@ -1,16 +1,15 @@
-import store from "../store";
 import {useState} from "react";
 
-export default function AddNumber() {
-    const [number, setNumber] = useState(1);
-    const onChange = (e) => setNumber(Number(e.target.value));
+export default function AddNumber(props) {
+    const [size, setSize] = useState(1);
+    const onChange = (e) => setSize(Number(e.target.value));
     return (
         <div className="addNumber">
             <h1>Add Number</h1>
             <input type="button" value="+" onClick={()=>
-                store.dispatch({type:'INCREMENT', size: number})
+                props.onClick(size)
             }/>
-            <input type="text" value={number} onChange={onChange}/>
+            <input type="text" value={size} onChange={onChange}/>
         </div>
     )
 }
