@@ -4,7 +4,7 @@ export default function DisplayNumberRoot(){
     return (
         <div className="displayNumberRoot">
             <h1>DisplayNumberRoot</h1>
-            <DisplayNumber/>
+            <DisplayNumber unit="kg"/>
         </div>
     )
 }
