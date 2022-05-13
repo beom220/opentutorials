@@ -1,4 +1,4 @@
-import DisplayNumber from "./DisplayNumber";
+import DisplayNumber from "../containers/DisplayNumber";
 
 export default function DisplayNumberRoot(){
     return (
