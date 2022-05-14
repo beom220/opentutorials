@@ -4,7 +4,7 @@ const url = require('url');
 
 const templateHTML = (title, list, body) => {
     return `<!doctype html>
-    <html>
+    <html lang="ko">
         <head>
           <title>${title}</title>
           <meta charset="utf-8">
@@ -17,24 +17,17 @@ const templateHTML = (title, list, body) => {
     </html>`;
 }
 const templateList = (filelist) => {
-    let list = '<ul>';
-    let i = 0;
-    while(i < filelist.length){
-        list += `<li><a href="/?id=${filelist[i]}">${filelist[i]}</a></li>`
-        i += 1;
-    }
-    list += '</ul>';
-    return list;
+    return `<ul>${filelist?.map((file)=>`<li><a href="/?id=${file}">${file}</a></li>`).join('')}</ul>`;
 }
 
-const app = http.createServer(function(request,response){
+const app = http.createServer((request,response) => {
     const _url = request.url;
     const queryData = url.parse(_url, true).query; // Note Node.js에서 URL을 통해서 입력된 값을 사용하는 방법
     const pathName = url.parse(_url, true).pathname;
     const _dir = './data';
 
     if(pathName === '/'){
-        if(!queryData.id){
+        if(!queryData.id){ // index일 때 queryString의 값이 undefinded
             fs.readdir(_dir, (err, filelist) => {
                 let title  = 'WelCome';
                 let data = 'Hello, NodeJs';
@@ -45,7 +38,7 @@ const app = http.createServer(function(request,response){
                 response.end(template);
             })
         }
-        if(queryData.id){
+        if(queryData.id){ //
             fs.readdir(_dir, (err, filelist) => {
                 fs.readFile(`./data/${queryData.id}`, 'utf-8', (err, data) => {
                     let title = queryData.id;
