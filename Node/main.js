@@ -1,17 +1,23 @@
 const http = require('http');
 const fs = require('fs');
+const url = require('url');
+
 const app = http.createServer(function(request,response){
-    let url = request.url;
-    if(request.url == '/'){
-        url = '/index.html';
+    let _url = request.url;
+    // Node.js에서 URL을 통해서 입력된 값을 사용하는 방법
+    const queryData = url.parse(_url, true).query;
+
+    console.log(queryData);
+    if(_url == '/'){
+        _url = '/index.html';
     }
-    if(request.url == '/favicon.ico'){
+    if(_url == '/favicon.ico'){
         response.writeHead(404);
         response.end();
         return;
     }
     response.writeHead(200);
-    response.end(fs.readFileSync(__dirname + url));
+    response.end(queryData.id);
 
 });
 app.listen(3000);
