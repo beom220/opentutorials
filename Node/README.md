@@ -61,6 +61,7 @@ request.on('end', () => {
         })
     })
 ```
+***
 + ### 파일 삭제 
     + 삭제는 반드시 링크가 아닌, post로 전송해야한다. 
 ```javascript
@@ -79,3 +80,17 @@ fs.unlink(`data/${id}`, (err) => {
     }
 })
 ```
+***
+## Security
+- ### Issue 입력정보에 대한 보안</br>
+<code>
+  <span style="display: flex">
+  <img style="width: 50%;" src="img_1.png"/>
+  <img style="width: 50%;" src="img_2.png"/>
+  </span>
+</code>
+
++ ### 출력정보에 대한 보안</br>
+<code><img style="width: 50%;" src="img_3.png"/></code>
+
+> `sanitize html`을 통하여 외부입력을 방어
