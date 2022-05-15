@@ -3,24 +3,26 @@ const fs = require('fs');
 const url = require('url');
 const qs = require('querystring');
 
-const templateHTML = (title, list, body, control) => {
-    if(!control) control = '';
-    return `<!doctype html>
-    <html lang="ko">
-        <head>
-          <title>${title}</title>
-          <meta charset="utf-8">
-        </head>
-        <body> 
-          <h1><a href="/">WEB</a></h1>
-          ${list}
-          ${control}
-          ${body}
-        </body>
-    </html>`;
-}
-const templateList = (filelist) => {
-    return `<ul>${filelist?.map((file)=>`<li><a href="/?id=${file}">${file}</a></li>`).join('')}</ul>`;
+const template = {
+    HTML: (title, list, body, control) => {
+        if(!control) control = '';
+        return `<!doctype html>
+            <html lang="ko">
+                <head>
+                  <title>${title}</title>
+                  <meta charset="utf-8">
+                </head>
+                <body> 
+                  <h1><a href="/">WEB</a></h1>
+                  ${list}
+                  ${control}
+                  ${body}
+                </body>
+            </html>`;
+    },
+    list: (filelist) => {
+        return `<ul>${filelist?.map((file) => `<li><a href="/?id=${file}">${file}</a></li>`).join('')}</ul>`;
+    }
 }
 
 const app = http.createServer((request,response) => {
@@ -29,43 +31,41 @@ const app = http.createServer((request,response) => {
     const pathName = url.parse(_url, true).pathname;
     const _dir = './data';
 
-    console.log(pathName);
-
     if(pathName === '/'){
         if(!queryData.id){ // index일 때 queryString의 값이 undefinded
-            return fs.readdir(_dir, (err, filelist) => {
-                let title  = 'WelCome';
-                let data = 'Hello, NodeJs';
-                let list = templateList(filelist);
+            fs.readdir(_dir, (err, filelist) => {
+                const title  = 'WelCome';
+                const data = 'Hello, NodeJs';
+                const list = template.list(filelist);
                 const body = `<h2>${title}</h2><p>${data}</p>`;
-                const template = templateHTML(title, list, body, null);
+                const html = template.HTML(title, list, body, null);
                 response.writeHead(200);
-                response.end(template);
+                response.end(html);
             })
         }
         if(queryData.id){
-            return fs.readdir(_dir, (err, filelist) => {
-                fs.readFile(`./data/${queryData.id}`, 'utf8', (err, data) => {
-                    let title = queryData.id;
-                    let list = templateList(filelist);
+            fs.readdir(_dir, (err, filelist) => {
+                fs.readFile(`./data/${queryData.id}`, 'utf-8', (err, data) => {
+                    const title = queryData.id;
+                    const list = template.list(filelist);
                     const body = `<h2>${title}</h2><p>${data}</p>`;
                     const control = `
-                        <a href="/create">create</a> <a href="/update?id=${title}">update</a> 
+                        <a href="/create">create</a> <a href="/update?id=${title}">update</a>
                         <form action="delete_process" method="post">
                             <input type="hidden" name="id" value="${title}"/>
                             <input type="submit" value="delete"/>
                         </form>
                     `;
-                    const template = templateHTML(title, list, body, control);
+                    const html = template.HTML(title, list, body, control);
                     response.writeHead(200);
-                    response.end(template);
+                    response.end(html);
                 })
             })
         }
     } else if(pathName === '/create'){
-        return fs.readdir(_dir, (err, filelist) => {
-            let title  = 'Web - Create';
-            let list = templateList(filelist);
+        fs.readdir(_dir, (err, filelist) => {
+            const title  = 'Web - Create';
+            const list = template.list(filelist);
             const body = `
             <form action="/create_process" method="post">
                 <p><input type="text" name="title" placeholder="title"/></p>
@@ -76,9 +76,9 @@ const app = http.createServer((request,response) => {
                   <input type="submit"/>
                 </p>
             </form>`;
-            const template = templateHTML(title, list, body, null);
+            const html = template.HTML(title, list, body, null);
             response.writeHead(200);
-            response.end(template);
+            response.end(html);
         })
     } else if(pathName === '/create_process'){
         // post data 받는 작업, body += data;
@@ -94,7 +94,7 @@ const app = http.createServer((request,response) => {
             const title = post.title;
             const description = post.description;
             // 파일 생성
-            fs.writeFile(`data/${title}`, description, 'utf8', (err) => {
+            fs.writeFile(`data/${title}`, description, 'utf-8', (err) => {
                 if(err) throw err;
                 else {
                     // Note 302는 리다이렉션을 뜻한다
@@ -105,10 +105,10 @@ const app = http.createServer((request,response) => {
             })
         })
     } else if (pathName === '/update'){
-        return fs.readdir(_dir, (err, filelist) => {
-            fs.readFile(`./data/${queryData.id}`, 'utf8', (err, data) => {
-                let title = queryData.id;
-                let list = templateList(filelist);
+        fs.readdir(_dir, (err, filelist) => {
+            fs.readFile(`./data/${queryData.id}`, 'utf-8', (err, data) => {
+                const title = queryData.id;
+                const list = template.list(filelist);
                 const body = `
                     <form action="/update_process" method="post">
                         <!--선택한 파일 정보-->
@@ -121,9 +121,9 @@ const app = http.createServer((request,response) => {
                           <input type="submit"/>
                         </p>
                     </form>`;
-                const template = templateHTML(title, list, body, null);
+                const html = template.HTML(title, list, body, null);
                 response.writeHead(200);
-                response.end(template);
+                response.end(html);
             })
         })
     } else if (pathName === '/update_process'){
@@ -142,7 +142,7 @@ const app = http.createServer((request,response) => {
                 if(err) throw err;
                 else {
                     // 내용을 업데이트 한다
-                    fs.writeFile(`data/${title}`, description, 'utf8', (err) => {
+                    fs.writeFile(`data/${title}`, description, 'utf-8', (err) => {
                         if (err) throw err;
                         else {
                             response.writeHead(302, {Location: `/?id=${title}`});
