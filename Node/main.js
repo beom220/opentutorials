@@ -3,7 +3,8 @@ const fs = require('fs');
 const url = require('url');
 const qs = require('querystring');
 const path = require('path');
-const template = require('./lib/template')
+const template = require('./lib/template');
+const sanitizeHtml = require('sanitize-html');
 
 const app = http.createServer((request,response) => {
     const _url = request.url;
@@ -28,12 +29,14 @@ const app = http.createServer((request,response) => {
                 const filteredId = path.parse(queryData.id).base;
                 fs.readFile(`./data/${filteredId}`, 'utf-8', (err, data) => {
                     const title = queryData.id;
+                    const sanitizedTitle = sanitizeHtml(title);
+                    const sanitizedData = sanitizeHtml(data, {allowedTags: ['h2']});
                     const list = template.list(filelist);
-                    const body = `<h2>${title}</h2><p>${data}</p>`;
+                    const body = `<h2>${sanitizedTitle}</h2><p>${sanitizedData}</p>`;
                     const control = `
-                        <a href="/create">create</a> <a href="/update?id=${title}">update</a>
+                        <a href="/create">create</a> <a href="/update?id=${sanitizedTitle}">update</a>
                         <form action="delete_process" method="post">
-                            <input type="hidden" name="id" value="${title}"/>
+                            <input type="hidden" name="id" value="${sanitizedTitle}"/>
                             <input type="submit" value="delete"/>
                         </form>
                     `;
@@ -74,6 +77,7 @@ const app = http.createServer((request,response) => {
             const post = qs.parse(body);
             const title = post.title;
             const description = post.description;
+
             // 파일 생성
             fs.writeFile(`data/${title}`, description, 'utf-8', (err) => {
                 if(err) throw err;
@@ -91,13 +95,15 @@ const app = http.createServer((request,response) => {
             fs.readFile(`./data/${filteredId}`, 'utf-8', (err, data) => {
                 const title = queryData.id;
                 const list = template.list(filelist);
+                const sanitizedTitle = sanitizeHtml(title);
+                const sanitizedData = sanitizeHtml(data, {allowedTags: ['h2']});
                 const body = `
                     <form action="/update_process" method="post">
                         <!--선택한 파일 정보-->
-                        <input type="hidden" name="id" value="${title}"/>
-                        <p><input type="text" name="title" placeholder="title" value="${title}"/></p>
+                        <input type="hidden" name="id" value="${sanitizedTitle}"/>
+                        <p><input type="text" name="title" placeholder="title" value="${sanitizedTitle}"/></p>
                         <p>
-                          <textarea name="description" placeholder="description">${data}</textarea>
+                          <textarea name="description" placeholder="description">${sanitizedData}</textarea>
                         </p>
                         <p>
                           <input type="submit"/>
@@ -118,16 +124,18 @@ const app = http.createServer((request,response) => {
             const id = post.id;
             const title = post.title;
             const description = post.description;
-
+            const sanitizedId = sanitizeHtml(id);
+            const sanitizedTitle = sanitizeHtml(title);
+            const sanitizedDescription = sanitizeHtml(description, {allowedTags: ['h2']});
             // 이전제목을 새로운 제목으로 바꾼다
-            fs.rename(`data/${id}`, `data/${title}`, (err) => {
+            fs.rename(`data/${sanitizedId}`, `data/${sanitizedTitle}`, (err) => {
                 if(err) throw err;
                 else {
                     // 내용을 업데이트 한다
-                    fs.writeFile(`data/${title}`, description, 'utf-8', (err) => {
+                    fs.writeFile(`data/${sanitizedTitle}`, sanitizedDescription, 'utf-8', (err) => {
                         if (err) throw err;
                         else {
-                            response.writeHead(302, {Location: `/?id=${title}`});
+                            response.writeHead(302, {Location: `/?id=${sanitizedTitle}`});
                             response.end();
                         }
                     })
