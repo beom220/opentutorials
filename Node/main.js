@@ -2,6 +2,7 @@ const http = require('http');
 const fs = require('fs');
 const url = require('url');
 const qs = require('querystring');
+const path = require('path');
 const template = require('./lib/template')
 
 const app = http.createServer((request,response) => {
@@ -24,7 +25,8 @@ const app = http.createServer((request,response) => {
         }
         if(queryData.id){
             fs.readdir(_dir, (err, filelist) => {
-                fs.readFile(`./data/${queryData.id}`, 'utf-8', (err, data) => {
+                const filteredId = path.parse(queryData.id).base;
+                fs.readFile(`./data/${filteredId}`, 'utf-8', (err, data) => {
                     const title = queryData.id;
                     const list = template.list(filelist);
                     const body = `<h2>${title}</h2><p>${data}</p>`;
@@ -85,7 +87,8 @@ const app = http.createServer((request,response) => {
         })
     } else if (pathName === '/update'){
         fs.readdir(_dir, (err, filelist) => {
-            fs.readFile(`./data/${queryData.id}`, 'utf-8', (err, data) => {
+            const filteredId = path.parse(queryData.id).base;
+            fs.readFile(`./data/${filteredId}`, 'utf-8', (err, data) => {
                 const title = queryData.id;
                 const list = template.list(filelist);
                 const body = `
@@ -139,8 +142,9 @@ const app = http.createServer((request,response) => {
         request.on('end', () => {
             const post = qs.parse(body);
             const id = post.id;
+            const filteredId = path.parse(id).base;
             // 파일 삭제
-            fs.unlink(`data/${id}`, (err) => {
+            fs.unlink(`data/${filteredId}`, (err) => {
                 if (err) throw err;
                 else {
                     response.writeHead(302, {Location: '/'});
