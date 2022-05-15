@@ -5,6 +5,17 @@ const qs = require('querystring');
 const path = require('path');
 const template = require('./lib/template');
 const sanitizeHtml = require('sanitize-html');
+const mysql = require('mysql');
+
+// mySQL 연결
+const db = mysql.createConnection({
+    host     : '127.0.0.1',
+    user     : 'node',
+    password : 'qwer1234',
+    database : 'node',
+    port : 3306,
+});
+db.connect();
 
 const app = http.createServer((request,response) => {
     const _url = request.url;
@@ -14,10 +25,11 @@ const app = http.createServer((request,response) => {
 
     if(pathName === '/'){
         if(!queryData.id){ // index일 때 queryString의 값이 undefinded
-            fs.readdir(_dir, (err, filelist) => {
+            // language=SQL format=false
+            db.query(`SELECT * FROM topic`, (error, topics) =>{
                 const title  = 'WelCome';
                 const data = 'Hello, NodeJs';
-                const list = template.list(filelist);
+                const list = template.list(topics);
                 const body = `<h2>${title}</h2><p>${data}</p>`;
                 const html = template.HTML(title, list, body, null);
                 response.writeHead(200);
@@ -25,18 +37,18 @@ const app = http.createServer((request,response) => {
             })
         }
         if(queryData.id){
-            fs.readdir(_dir, (err, filelist) => {
-                const filteredId = path.parse(queryData.id).base;
-                fs.readFile(`./data/${filteredId}`, 'utf-8', (err, data) => {
-                    const title = queryData.id;
-                    const sanitizedTitle = sanitizeHtml(title);
-                    const sanitizedData = sanitizeHtml(data, {allowedTags: ['h2']});
-                    const list = template.list(filelist);
-                    const body = `<h2>${sanitizedTitle}</h2><p>${sanitizedData}</p>`;
+            db.query(`SELECT * FROM topic`, (error, topics) =>{
+                if(error) throw error;
+                db.query(`SELECT * FROM topic WHERE id=?`, [queryData.id], (error2, topic) =>{
+                    if(error2) throw error2;
+                    const title  = topic[0].title;
+                    const data = topic[0].description;
+                    const list = template.list(topics);
+                    const body = `<h2>${title}</h2><p>${data}</p>`;
                     const control = `
-                        <a href="/create">create</a> <a href="/update?id=${sanitizedTitle}">update</a>
+                        <a href="/create">create</a> <a href="/update?id=${queryData.id}">update</a>
                         <form action="delete_process" method="post">
-                            <input type="hidden" name="id" value="${sanitizedTitle}"/>
+                            <input type="hidden" name="id" value="${queryData.id}"/>
                             <input type="submit" value="delete"/>
                         </form>
                     `;
@@ -47,9 +59,10 @@ const app = http.createServer((request,response) => {
             })
         }
     } else if(pathName === '/create'){
-        fs.readdir(_dir, (err, filelist) => {
+        db.query(`SELECT * FROM topic`, (error, topics) =>{
+            if(error) throw error;
             const title  = 'Web - Create';
-            const list = template.list(filelist);
+            const list = template.list(topics);
             const body = `
             <form action="/create_process" method="post">
                 <p><input type="text" name="title" placeholder="title"/></p>
@@ -78,32 +91,29 @@ const app = http.createServer((request,response) => {
             const title = post.title;
             const description = post.description;
 
-            // 파일 생성
-            fs.writeFile(`data/${title}`, description, 'utf-8', (err) => {
-                if(err) throw err;
-                else {
-                    // Note 302는 리다이렉션을 뜻한다
-                    // 성공하면 생성된 페이지로 이동
-                    response.writeHead(302, {Location: `/?id=${title}`});
+            db.query(`INSERT INTO topic (title, description, created, author_id) VALUES (?, ?, Now(), ?)`,
+                [title, description, 1],
+                (error, result) => {
+                    if (error) throw error;
+                    response.writeHead(302, {Location: `/?id=${result.insertId}`});
                     response.end();
                 }
-            })
+            )
         })
     } else if (pathName === '/update'){
-        fs.readdir(_dir, (err, filelist) => {
-            const filteredId = path.parse(queryData.id).base;
-            fs.readFile(`./data/${filteredId}`, 'utf-8', (err, data) => {
-                const title = queryData.id;
-                const list = template.list(filelist);
-                const sanitizedTitle = sanitizeHtml(title);
-                const sanitizedData = sanitizeHtml(data, {allowedTags: ['h2']});
+        db.query(`SELECT * FROM topic`, (error, topics) =>{
+            if(error) throw error;
+            db.query(`SELECT * FROM topic WHERE id=?`, [queryData.id], (error2, topic) => {
+                if(error2) throw error2;
+                const title = topic[0].title;
+                const list = template.list(topics);
                 const body = `
                     <form action="/update_process" method="post">
                         <!--선택한 파일 정보-->
-                        <input type="hidden" name="id" value="${sanitizedTitle}"/>
-                        <p><input type="text" name="title" placeholder="title" value="${sanitizedTitle}"/></p>
+                        <input type="hidden" name="id" value="${topic[0].id}"/>
+                        <p><input type="text" name="title" placeholder="title" value="${title}"/></p>
                         <p>
-                          <textarea name="description" placeholder="description">${sanitizedData}</textarea>
+                          <textarea name="description" placeholder="description">${topic[0].description}</textarea>
                         </p>
                         <p>
                           <input type="submit"/>
@@ -124,22 +134,11 @@ const app = http.createServer((request,response) => {
             const id = post.id;
             const title = post.title;
             const description = post.description;
-            const sanitizedId = sanitizeHtml(id);
-            const sanitizedTitle = sanitizeHtml(title);
-            const sanitizedDescription = sanitizeHtml(description, {allowedTags: ['h2']});
-            // 이전제목을 새로운 제목으로 바꾼다
-            fs.rename(`data/${sanitizedId}`, `data/${sanitizedTitle}`, (err) => {
-                if(err) throw err;
-                else {
-                    // 내용을 업데이트 한다
-                    fs.writeFile(`data/${sanitizedTitle}`, sanitizedDescription, 'utf-8', (err) => {
-                        if (err) throw err;
-                        else {
-                            response.writeHead(302, {Location: `/?id=${sanitizedTitle}`});
-                            response.end();
-                        }
-                    })
-                }
+
+            db.query(`UPDATE topic SET title=?, description=?, author_id=1 WHERE id=?`, [title, description, id], (error, result)=>{
+                if(error) throw error;
+                response.writeHead(302, {Location: `/?id=${id}`});
+                response.end();
             })
         })
     } else if (pathName === '/delete_process'){
@@ -150,15 +149,12 @@ const app = http.createServer((request,response) => {
         request.on('end', () => {
             const post = qs.parse(body);
             const id = post.id;
-            const filteredId = path.parse(id).base;
-            // 파일 삭제
-            fs.unlink(`data/${filteredId}`, (err) => {
-                if (err) throw err;
-                else {
-                    response.writeHead(302, {Location: '/'});
-                    response.end();
-                }
-            })
+
+            db.query(`DELETE FROM topic WHERE id = ?`, [id], (error, result) => {
+                if(error) throw error;
+                response.writeHead(302, {Location: '/'});
+                response.end();
+            });
         })
     } else {
         response.writeHead(404); // Note 404 === page not found

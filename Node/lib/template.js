@@ -15,7 +15,7 @@ module.exports = {
                 </body>
             </html>`;
     },
-    list: (filelist) => {
-        return `<ul>${filelist?.map((file) => `<li><a href="/?id=${file}">${file}</a></li>`).join('')}</ul>`;
+    list: (topics) => {
+        return `<ul>${topics?.map((topic) => `<li><a href="/?id=${topic.id}">${topic.title}</a></li>`).join('')}</ul>`;
     }
 }
