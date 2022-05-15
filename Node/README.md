@@ -82,21 +82,20 @@ fs.unlink(`data/${id}`, (err) => {
 ```
 ***
 ## Security
-- ### Issue 입력정보에 대한 보안</br>
+- ### 입력정보에 대한 보안</br>
 <code>
 <span style="display: flex; justify-content: space-between">
-<img src="img_1.png" style="width: 49%"/>
-<img src="img_2.png" style="width: 49%"/>
+    <img src="img_2.png" style="width: 49%"/>
+    <img src="img_1.png" style="width: 49%"/>
 </span>
 </code>
 
 ```javascript
 const filteredId = path.parse(queryData.id).base;
 ```
-node path api를 사용하여 path 보호
-  
-
+> node path api를 사용하여 path 보호
+***
 + ### 출력정보에 대한 보안</br>
 ![img_3.png](img_3.png)
 
-> `sanitize html`을 통하여 외부입력을 방어
+> `sanitize-html`API를 통하여 외부입력을 방어
