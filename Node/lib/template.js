@@ -9,13 +9,41 @@ module.exports = {
                 </head>
                 <body> 
                   <h1><a href="/">WEB</a></h1>
+                  <a href="/author">author</a>
                   ${list}
                   ${control}
                   ${body}
                 </body>
             </html>`;
     },
-    list: (filelist) => {
-        return `<ul>${filelist?.map((file) => `<li><a href="/?id=${file}">${file}</a></li>`).join('')}</ul>`;
+    list: (topics) => {
+        return `<ul>${topics?.map((topic) => `<li><a href="/?id=${topic.id}">${topic.title}</a></li>`).join('')}</ul>`;
+    },
+    authorSelect : (authors, author_id) => {
+        let tag = '';
+        let selected = '';
+        authors.map((v, i)=>{
+            if(v === author_id) selected = ' selected';
+            tag += `<option value="${authors[i].id}" ${selected}>${authors[i].name}</option>`;
+        })
+        return `<select name="author">${tag}</select>`
+    },
+    authorTable: (authors) => {
+        let tag = '<table>';
+        authors.map((author, i) => {
+            tag += `<tr>
+                <td>${author.name}</td>
+                <td>${author.profile}</td>
+                <td><a href="/author/update?id=${author.id}">update</a></td>
+                <td>
+                    <form action="/author/delete_process" method="post">
+                        <input type="hidden" name="id" value="${author.id}">
+                        <input type="submit" value="delete">
+                    </form>
+                </td>
+            </tr>`
+        })
+        tag += '</table>';
+        return tag;
     }
 }
