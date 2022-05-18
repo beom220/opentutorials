@@ -23,10 +23,8 @@ module.exports = {
         let tag = '';
         let selected = '';
         authors.map((v, i)=>{
-            if(v === author_id){
-                selected = ' selected';
-            }
-            tag += `<option value="${v}" ${selected}>${authors[i].name}</option>`;
+            if(v === author_id) selected = ' selected';
+            tag += `<option value="${authors[i].id}" ${selected}>${authors[i].name}</option>`;
         })
         return `<select name="author">${tag}</select>`
     },
@@ -36,8 +34,13 @@ module.exports = {
             tag += `<tr>
                 <td>${author.name}</td>
                 <td>${author.profile}</td>
-                <td>update</td>
-                <td>delete</td>
+                <td><a href="/author/update?id=${author.id}">update</a></td>
+                <td>
+                    <form action="/author/delete_process" method="post">
+                        <input type="hidden" name="id" value="${author.id}">
+                        <input type="submit" value="delete">
+                    </form>
+                </td>
             </tr>`
         })
         tag += '</table>';

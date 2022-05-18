@@ -27,6 +27,12 @@ const app = http.createServer((request,response) => {
         author.home(request,response);
     } else if (pathName === '/author/create_process'){
         author.create_process(request,response);
+    } else if (pathName === '/author/update'){
+        author.update(request,response);
+    } else if (pathName === '/author/update_process'){
+        author.update_process(request,response);
+    } else if (pathName === '/author/delete_process'){
+        author.delete_process(request,response);
     } else {
         response.writeHead(404); // Note 404 === page not found
         response.end('Not found');

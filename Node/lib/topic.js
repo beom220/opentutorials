@@ -3,6 +3,7 @@ const url = require('url');
 const qs = require('querystring');
 const template = require('./template');
 
+
 exports.home = (request, response) => {
     db.query(`SELECT * FROM topic`, (error, topics) =>{
         const title  = 'WelCome';
@@ -20,19 +21,22 @@ exports.page = (request, response) => {
     const queryData = url.parse(_url, true).query; // Note Node.js에서 URL을 통해서 입력된 값을 사용하는 방법
     db.query(`SELECT * FROM topic`, (error, topics) =>{
         if(error) throw error;
-        db.query(`SELECT * FROM topic WHERE id=?`, [queryData.id], (error2, topic) =>{
+        db.query(`SELECT * FROM topic LEFT JOIN author ON topic.author_id = author.id WHERE topic.id=?`, [queryData.id], (error2, topic) =>{
             if(error2) throw error2;
+            console.log(topic);
             const title  = topic[0].title;
             const data = topic[0].description;
             const list = template.list(topics);
-            const body = `<h2>${title}</h2><p>${data}</p>`;
+            const author = topic[0].name;
+            console.log(author);
+            const body = `<h2>${title}</h2><p>${data}</p><p>by ${author}</p>`;
             const control = `
-                        <a href="/create">create</a> <a href="/update?id=${queryData.id}">update</a>
-                        <form action="delete_process" method="post">
-                            <input type="hidden" name="id" value="${queryData.id}"/>
-                            <input type="submit" value="delete"/>
-                        </form>
-                    `;
+                <a href="/create">create</a> <a href="/update?id=${queryData.id}">update</a>
+                <form action="delete_process" method="post">
+                    <input type="hidden" name="id" value="${queryData.id}"/>
+                    <input type="submit" value="delete"/>
+                </form>
+            `;
             const html = template.HTML(title, list, body, control);
             response.writeHead(200);
             response.end(html);
@@ -43,21 +47,26 @@ exports.page = (request, response) => {
 exports.create =  (request, response) => {
     db.query(`SELECT * FROM topic`, (error, topics) =>{
         if(error) throw error;
-        const title  = 'Web - Create';
-        const list = template.list(topics);
-        const body = `
+        db.query(`SELECT * FROM author`, (error2, authors)=> {
+            if(error2) throw error2;
+            const select = template.authorSelect(authors);
+            const title  = 'Web - Create';
+            const list = template.list(topics);
+            const body = `
             <form action="/create_process" method="post">
                 <p><input type="text" name="title" placeholder="title"/></p>
                 <p>
                   <textarea name="description" placeholder="description"></textarea>
                 </p>
                 <p>
-                  <input type="submit"/>
+                    ${select}
+                    <input type="submit"/>
                 </p>
             </form>`;
-        const html = template.HTML(title, list, body, null);
-        response.writeHead(200);
-        response.end(html);
+            const html = template.HTML(title, list, body, null);
+            response.writeHead(200);
+            response.end(html);
+        })
     })
 }
 
@@ -66,6 +75,7 @@ exports.create_process = (request, response) => {
     let body = '';
     request.on('data', (data) => {
         body += data;
+        console.log(body);
         // Note data 양이 너무 많을경우 접속을 끊어버림 (보안장치)
         if(body.length > 1e6) request.connection.destroy();
     })
@@ -74,9 +84,10 @@ exports.create_process = (request, response) => {
         const post = qs.parse(body);
         const title = post.title;
         const description = post.description;
+        const auth = post.author;
 
         db.query(`INSERT INTO topic (title, description, created, author_id) VALUES (?, ?, Now(), ?)`,
-            [title, description, 1],
+            [title, description, auth],
             (error, result) => {
                 if (error) throw error;
                 response.writeHead(302, {Location: `/?id=${result.insertId}`});
