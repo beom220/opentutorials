@@ -3,7 +3,6 @@ const url = require('url');
 const qs = require('querystring');
 const template = require('./template');
 
-
 exports.home = (request, response) => {
     db.query(`SELECT * FROM topic`, (error, topics) =>{
         const title  = 'WelCome';
@@ -23,12 +22,10 @@ exports.page = (request, response) => {
         if(error) throw error;
         db.query(`SELECT * FROM topic LEFT JOIN author ON topic.author_id = author.id WHERE topic.id=?`, [queryData.id], (error2, topic) =>{
             if(error2) throw error2;
-            console.log(topic);
             const title  = topic[0].title;
             const data = topic[0].description;
             const list = template.list(topics);
             const author = topic[0].name;
-            console.log(author);
             const body = `<h2>${title}</h2><p>${data}</p><p>by ${author}</p>`;
             const control = `
                 <a href="/create">create</a> <a href="/update?id=${queryData.id}">update</a>
