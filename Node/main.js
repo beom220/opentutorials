@@ -12,7 +12,7 @@ const app = http.createServer((request,response) => {
     if(pathName === '/'){
         // index일 때 queryString의 값이 undefinded
         if(!queryData.id) topic.home(request, response);
-        if(queryData.id)topic.page(request, response);
+        if(queryData.id) topic.page(request, response);
     } else if(pathName === '/create'){
         topic.create(request, response);
     } else if(pathName === '/create_process'){
@@ -25,6 +25,8 @@ const app = http.createServer((request,response) => {
         topic.delete_process(request,response);
     } else if (pathName === '/author'){
         author.home(request,response);
+    } else if (pathName === '/author/create_process'){
+        author.create_process(request,response);
     } else {
         response.writeHead(404); // Note 404 === page not found
         response.end('Not found');

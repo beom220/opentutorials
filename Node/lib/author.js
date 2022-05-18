@@ -1,4 +1,5 @@
 const db = require('./db');
+const qs = require('querystring');
 const template = require('./template');
 
 exports.home = (request, response) => {
@@ -27,5 +28,19 @@ exports.home = (request, response) => {
             response.end(html);
         })
     })
+}
 
+exports.create_process = (request, response) => {
+    let body = '';
+    request.on('data', data => {
+        body += data;
+    })
+    request.on('end', () =>{
+        const post = qs.parse(body);
+        db.query(`INSERT INTO author (name, profile) VALUES (?, ?)`, [post.name, post.profile], (error, result) => {
+            if(error) throw error;
+            response.writeHead(302, {Location : '/author'});
+            response.end();
+        })
+    })
 }
