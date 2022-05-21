@@ -1,41 +1,49 @@
-const http = require('http');
-const url = require('url');
-const db = require('./lib/db');
-const topic = require('./lib/topic');
-const author = require('./lib/author');
+const express = require('express');
+const bodyParser = require('body-parser');
+const helmet = require('helmet');
+const db = require("./lib/db");
+const authorRouter = require('./routes/author');
+const topicRouter = require('./routes/topic');
+const indexRouter = require('./routes/index');
 
-const app = http.createServer((request,response) => {
-    const _url = request.url;
-    const queryData = url.parse(_url, true).query; // Note Node.js에서 URL을 통해서 입력된 값을 사용하는 방법
-    const pathName = url.parse(_url, true).pathname;
+const app = express();
+const port = 3000;
 
-    if(pathName === '/'){
-        // index일 때 queryString의 값이 undefinded
-        if(!queryData.id) topic.home(request, response);
-        if(queryData.id) topic.page(request, response);
-    } else if(pathName === '/create'){
-        topic.create(request, response);
-    } else if(pathName === '/create_process'){
-        topic.create_process(request,response);
-    } else if (pathName === '/update'){
-        topic.update(request,response);
-    } else if (pathName === '/update_process'){
-        topic.update_process(request,response);
-    } else if (pathName === '/delete_process'){
-        topic.delete_process(request,response);
-    } else if (pathName === '/author'){
-        author.home(request,response);
-    } else if (pathName === '/author/create_process'){
-        author.create_process(request,response);
-    } else if (pathName === '/author/update'){
-        author.update(request,response);
-    } else if (pathName === '/author/update_process'){
-        author.update_process(request,response);
-    } else if (pathName === '/author/delete_process'){
-        author.delete_process(request,response);
-    } else {
-        response.writeHead(404); // Note 404 === page not found
-        response.end('Not found');
-    }
+//security
+app.use(helmet());
+// post data
+app.use(bodyParser.urlencoded({ extended: false }));
+
+// custom middleware
+// 모든 get 요청에 대해서 topic 테이블 저장
+app.get('*', (req,res,next) => {
+    db.query(`SELECT * FROM topic`, (error, topics) => {
+        req.list = topics;
+        next(); // 다음에 실행해야할 middleware 를 실행 할지 안할지 여부.
+    });
 });
-app.listen(3000);
+
+// routes
+// author
+app.use('/author', authorRouter);
+
+// topic
+app.use('/topic', topicRouter);
+
+// main
+app.get('/', indexRouter);
+
+// not found page
+app.use((req,res)=>{
+    res.status(404).send('Sorry find that');
+});
+
+// error page
+app.use((err,req,res,next) => {
+    console.error(err.stack);
+    res.status(500).send('Something broke!');
+});
+
+app.listen(port, () => {
+    console.log(`server listening to ${port}`)
+});

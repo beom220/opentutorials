@@ -17,7 +17,7 @@ module.exports = {
             </html>`;
     },
     list: (topics) => {
-        return `<ul>${topics?.map((topic) => `<li><a href="/?id=${topic.id}">${topic.title}</a></li>`).join('')}</ul>`;
+        return `<ul>${topics?.map((topic) => `<li><a href="/topic/${topic.id}">${topic.title}</a></li>`).join('')}</ul>`;
     },
     authorSelect : (authors, author_id) => {
         let tag = '';
@@ -34,7 +34,7 @@ module.exports = {
             tag += `<tr>
                 <td>${author.name}</td>
                 <td>${author.profile}</td>
-                <td><a href="/author/update?id=${author.id}">update</a></td>
+                <td><a href="/author/update/${author.id}">update</a></td>
                 <td>
                     <form action="/author/delete_process" method="post">
                         <input type="hidden" name="id" value="${author.id}">
