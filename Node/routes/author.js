@@ -5,6 +5,10 @@ const template = require('../lib/template');
 const path = require("path");
 
 router.get('/create',(req, res,next) => {
+    if(req.isOwner === false){
+        res.send('Login required. <a href="/login">go login</a>');
+        return false;
+    }
     db.query(`SELECT * FROM author`, (err, authors) => {
         if(err) next(err)
         const title = 'author';
@@ -26,14 +30,18 @@ router.get('/create',(req, res,next) => {
                 </p>
             </form>
         `
-        const html = template.HTML(title, list, body);
+        const html = template.HTML(title, list, body, null, req.authStateUI);
         res.send(html);
     })
 });
 
 router.post('/create_process', (req,res)=>{
-    const post = req.body;
+    if(req.isOwner === false){
+        res.send('Login required. <a href="/login">go login</a>');
+        return false;
+    }
 
+    const post = req.body;
     db.query(`INSERT INTO author (name, profile) VALUES (?, ?)`,
         [post.name, post.profile],
         (error, result) => {
@@ -44,6 +52,10 @@ router.post('/create_process', (req,res)=>{
 })
 
 router.post('/update_process', (req,res,next)=>{
+    if(req.isOwner === false){
+        res.send('Login required. <a href="/login">go login</a>');
+        return false;
+    }
     const post = req.body;
     const id = post.id;
     const name = post.name;
@@ -56,6 +68,10 @@ router.post('/update_process', (req,res,next)=>{
 })
 
 router.get('/update/:author_id', (req,res, next)=>{
+    if(req.isOwner === false){
+        res.send('Login required. <a href="/login">go login</a>');
+        return false;
+    }
     const authorId = path.parse(req.params.author_id).base;
     db.query(`SELECT * FROM author`, [authorId], (err, authors)=> {
         if(err) next(err);
@@ -80,16 +96,20 @@ router.get('/update/:author_id', (req,res, next)=>{
                         </p>
                     </form>
                 `;
-            const html = template.HTML(title, list, body, null);
+            const html = template.HTML(title, list, body, null, req.authStateUI);
             res.send(html);
         })
     })
 })
 
 router.post('/delete_process', (req,res,next) => {
+    if(req.isOwner === false){
+        res.send('Login required. <a href="/login">go login</a>');
+        return false;
+    }
+
     const post = req.body;
     const id = post.id;
-
     // 저자의 글목록 삭제
     db.query(`DELETE FROM topic WHERE author_id=?`, [id], (err, result) =>{
         if(err) throw next(err);
@@ -101,9 +121,9 @@ router.post('/delete_process', (req,res,next) => {
     })
 })
 
-router.get('/',(req, res) => {
+router.get('/',(req, res,next) => {
     db.query(`SELECT * FROM author`, (error2, authors) => {
-        if(error2) console.log( error2);
+        if(error2) next(error2);
         const title = 'author';
         const list = template.list(req.list);
         const style = `<style>table{border-collapse:collapse;}td{padding:8px 12px;border:1px solid #eee}</style>`;
@@ -112,7 +132,7 @@ router.get('/',(req, res) => {
             ${template.authorTable(authors)}
             <a href="/author/create">create</a>
         `
-        const html = template.HTML(title, list, body);
+        const html = template.HTML(title, list, body, null, req.authStateUI);
         res.send(html);
     })
 });

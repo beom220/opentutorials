@@ -1,18 +1,20 @@
 module.exports = {
-    HTML: (title, list, body, control) => {
+    HTML: (title, list, body, control, authStateUI) => {
         if(!control) control = '';
+        if(!list) list = '';
         return `<!doctype html>
             <html lang="ko">
                 <head>
                   <title>${title}</title>
                   <meta charset="utf-8">
                 </head>
-                <body> 
-                  <h1><a href="/">WEB</a></h1>
-                  <a href="/author">author</a>
-                  ${list}
-                  ${control}
-                  ${body}
+                <body>
+                    ${authStateUI} 
+                    <h1><a href="/">WEB</a></h1>
+                    <a href="/author">author</a>
+                    ${list}
+                    ${control}
+                    ${body}
                 </body>
             </html>`;
     },

@@ -7,7 +7,7 @@ router.get('/', (req,res) => {
     const data = 'Hello, NodeJs';
     const list = template.list(req.list);
     const body = `<h2>${title}</h2><p>${data}</p>`;
-    const html = template.HTML(title, list, body, null);
+    const html = template.HTML(title, list, body, null, req.authStateUI);
     res.send(html);
 });
 

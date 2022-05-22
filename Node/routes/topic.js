@@ -5,6 +5,10 @@ const template = require("../lib/template");
 const path = require("path");
 
 router.get('/create', (req, res, next) => {
+    if(req.isOwner === false){
+        res.send('Login required. <a href="/login">go login</a>');
+        return false;
+    }
     db.query(`SELECT * FROM author`, (error, authors)=> {
         if(error) next(error);
         const select = template.authorSelect(authors);
@@ -21,12 +25,17 @@ router.get('/create', (req, res, next) => {
                 <input type="submit"/>
             </p>
         </form>`;
-        const html = template.HTML(title, list, body, null);
+        const html = template.HTML(title, list, body, null, req.authStateUI);
         res.send(html);
     })
 })
 
 router.post('/create_process', (req, res) => {
+    if(req.isOwner === false){
+        res.send('Login required. <a href="/login">go login</a>');
+        return false;
+    }
+
     const post = req.body;
     const title = post.title;
     const description = post.description;
@@ -42,6 +51,10 @@ router.post('/create_process', (req, res) => {
 })
 
 router.post('/update_process', (req, res) => {
+    if(req.isOwner === false){
+        res.send('Login required. <a href="/login">go login</a>');
+        return false;
+    }
     const post = req.body;
     const id = post.id;
     const title = post.title;
@@ -56,6 +69,10 @@ router.post('/update_process', (req, res) => {
 })
 
 router.get('/update/:topic_id', (req,res) => {
+    if(req.isOwner === false){
+        res.send('Login required. <a href="/login">go login</a>');
+        return false;
+    }
     const topicId = path.parse(req.params.topic_id).base;
     db.query(`SELECT * FROM topic WHERE id=?`, [topicId], (error, topic) => {
         if(error) throw error;
@@ -73,15 +90,18 @@ router.get('/update/:topic_id', (req,res) => {
                   <input type="submit"/>
                 </p>
             </form>`;
-        const html = template.HTML(title, list, body, null);
+        const html = template.HTML(title, list, body, null, req.authStateUI);
         res.send(html);
     })
 })
 
 router.post('/delete_process', (req, res) => {
+    if(req.isOwner === false){
+        res.send('Login required. <a href="/login">go login</a>');
+        return false;
+    }
     const post = req.body;
     const id = post.id;
-
     db.query(`DELETE FROM topic WHERE id = ?`, [id], (error, result) => {
         if(error) throw error;
         res.redirect(302, `/`);
@@ -106,7 +126,7 @@ router.get('/:topic_id', (req,res,next) => {
                     <input type="submit" value="delete"/>
                 </form>
             `;
-            const html = template.HTML(title, list, body, control);
+            const html = template.HTML(title, list, body, control, req.authStateUI);
             res.send(html);
         }
     )
