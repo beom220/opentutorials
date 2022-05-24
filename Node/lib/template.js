@@ -1,5 +1,5 @@
 module.exports = {
-    HTML: (title, list, body, control, authStateUI) => {
+    HTML: (title, list, body, control) => {
         if(!control) control = '';
         if(!list) list = '';
         return `<!doctype html>
@@ -9,7 +9,6 @@ module.exports = {
                   <meta charset="utf-8">
                 </head>
                 <body>
-                    ${authStateUI} 
                     <h1><a href="/">WEB</a></h1>
                     <a href="/author">author</a>
                     ${list}

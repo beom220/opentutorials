@@ -18,32 +18,20 @@ app.use(cookieParser());
 // post data
 app.use(bodyParser.urlencoded({ extended: false }));
 
-function authIsOwner(req,res){
-    let isOwner = false;
-    if(req.cookies.name === 'master'){
-        isOwner = true;
-    }
-    return isOwner;
-}
-function authStateUi(req, res){
-    let authStateUI = '<a href="/login">login</a>';
-    if(authIsOwner(req,res)){
-        authStateUI = '<a href="/login/logout_process">logout</a>';
-    }
-    return authStateUI ;
-}
-
 // custom middleware
+app.get('*', (req, res, next)=>{
+    db.query(`SELECT name FROM author`, (err, authors)=> {
+        req.authors = authors;
+        next();
+    })
+})
+
 app.get('*', (req,res,next) => {
     // 모든 get 요청에 대해서 topic 테이블 저장
     db.query(`SELECT * FROM topic`, (error, topics) => {
         req.list = topics;
         next(); // 다음에 실행해야할 middleware 를 실행 할지 안할지 여부.
     });
-
-    // 로그인 여부
-    req.isOwner = authIsOwner(req, res);
-    req.authStateUI = authStateUi(req,res);
 });
 
 // routes

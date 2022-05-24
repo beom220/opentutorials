@@ -5,10 +5,7 @@ const template = require('../lib/template');
 const path = require("path");
 
 router.get('/create',(req, res,next) => {
-    if(req.isOwner === false){
-        res.send('Login required. <a href="/login">go login</a>');
-        return false;
-    }
+
     db.query(`SELECT * FROM author`, (err, authors) => {
         if(err) next(err)
         const title = 'author';
@@ -30,17 +27,12 @@ router.get('/create',(req, res,next) => {
                 </p>
             </form>
         `
-        const html = template.HTML(title, list, body, null, req.authStateUI);
+        const html = template.HTML(title, list, body, null);
         res.send(html);
     })
 });
 
 router.post('/create_process', (req,res)=>{
-    if(req.isOwner === false){
-        res.send('Login required. <a href="/login">go login</a>');
-        return false;
-    }
-
     const post = req.body;
     db.query(`INSERT INTO author (name, profile) VALUES (?, ?)`,
         [post.name, post.profile],
@@ -52,10 +44,6 @@ router.post('/create_process', (req,res)=>{
 })
 
 router.post('/update_process', (req,res,next)=>{
-    if(req.isOwner === false){
-        res.send('Login required. <a href="/login">go login</a>');
-        return false;
-    }
     const post = req.body;
     const id = post.id;
     const name = post.name;
@@ -68,10 +56,6 @@ router.post('/update_process', (req,res,next)=>{
 })
 
 router.get('/update/:author_id', (req,res, next)=>{
-    if(req.isOwner === false){
-        res.send('Login required. <a href="/login">go login</a>');
-        return false;
-    }
     const authorId = path.parse(req.params.author_id).base;
     db.query(`SELECT * FROM author`, [authorId], (err, authors)=> {
         if(err) next(err);
@@ -96,18 +80,13 @@ router.get('/update/:author_id', (req,res, next)=>{
                         </p>
                     </form>
                 `;
-            const html = template.HTML(title, list, body, null, req.authStateUI);
+            const html = template.HTML(title, list, body, null);
             res.send(html);
         })
     })
 })
 
 router.post('/delete_process', (req,res,next) => {
-    if(req.isOwner === false){
-        res.send('Login required. <a href="/login">go login</a>');
-        return false;
-    }
-
     const post = req.body;
     const id = post.id;
     // 저자의 글목록 삭제
@@ -132,7 +111,7 @@ router.get('/',(req, res,next) => {
             ${template.authorTable(authors)}
             <a href="/author/create">create</a>
         `
-        const html = template.HTML(title, list, body, null, req.authStateUI);
+        const html = template.HTML(title, list, body, null);
         res.send(html);
     })
 });

@@ -36,13 +36,13 @@ router.get('/', (req,res,next)=> {
                 <input type="text" name="name" placeholder="name">
             </p>
             <p>
-                <textarea name="profile" placeholder="profile"></textarea>
+                <input type="text" name="profile" placeholder="profile"/>
             </p>
             <p>
-                <input type="submit">
+                <input type="submit" value="login">
             </p>
         </form>`;
-    const html = template.HTML(title, null, body, null, req.authStateUI);
+    const html = template.HTML(title, null, body, null);
     res.send(html);
 });
 
