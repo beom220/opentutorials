@@ -29,11 +29,8 @@ app.use(session({
     saveUninitialized: true,
     store: new FileStore()
 }))
-// 사용자 정보
-const authData = {
-    email : 'master@gmail.com',
-    password : 'qwer1234',
-}
+
+
 // Note passport는 session & bodyparser에 의존하고 있기때문에 세션을 활성화 시킨뒤에 호출되어야 한다.
 // TODO 03 Passport 불러오기
 app.use(passport.initialize());
@@ -41,13 +38,16 @@ app.use(passport.session());
 
 // TODO 06 전달받은 data를 세션Store에 저장
 passport.serializeUser((user, done) => {
-    console.log('serializeUser', user);
+    // console.log('serializeUser', user);
     done(null, user.email);
 });
 // TODO 07 페이지방문시 세션Store정보를 조회
 passport.deserializeUser((id, done) => {
-    console.log('deserializeUser', id);
-    done(null, authData);
+    // console.log('deserializeUser', id);
+    db.query(`SELECT email, password FROM author WHERE email=?`, [id], (err, row)=> {
+        if(err) return done(null, false, {message : 'Sql Error'});
+        done(null, row[0])
+    })
 })
 
 // TODO 05 전달받은 data를 인증하고 세션으로 전달
@@ -56,23 +56,21 @@ passport.use(new LocalStrategy({
         passwordField: 'password'
     },
     (username, password, done) => {
-        if(username === authData.email){
-            console.log(1);
-            if(password === authData.password){
-                console.log(2);
-                return done(null, authData);
-            } else {
-                console.log(3);
-                return done(null, false, {
-                    message: 'Incorrect password.'
-                })
-            }
-        } else {
-            console.log(4);
-            return done(null, false, {
-                message: 'Incorrect username.'
+        db.query(`SELECT email FROM author` , (err, rows) => {
+            if(err) return done(null, false, {message : 'Sql Error'});
+
+            // email 전체를 가져와서 입력값이 일치하는것 배열로 저장
+            const user = rows.filter(v => username === v.email);
+            // 일치하지 않다면 이메일 에러
+            if(user.length === 0) return done(null, false, {message : 'email error'});
+
+            db.query(`SELECT email, password FROM author WHERE email=? AND password=?`, [username, password], (err2, row) => {
+                if(err2) return done(null, false, {message : 'Sql Error'});
+                // console.log(row[0]);
+                if(password !== row[0].password) return done(null, false, {message: 'error pw'})
+                if(password === row[0].password) return done(null, row[0])
             })
-        }
+        })
     }
 ))
 
@@ -81,7 +79,8 @@ app.post('/login/login_process',
     passport.authenticate('local', {
         successRedirect: '/',
         failureRedirect: '/login'
-    }))
+    }));
+
 
 // custom middleware
 app.get('*', (req, res, next)=>{
