@@ -3,6 +3,7 @@ const router = express.Router();
 const db = require("../lib/db");
 const template = require("../lib/template");
 const path = require("path");
+const register = require('../lib/register');
 
 router.get('/create', (req, res, next) => {
     db.query(`SELECT * FROM author`, (error, authors)=> {
@@ -21,7 +22,7 @@ router.get('/create', (req, res, next) => {
                 <input type="submit"/>
             </p>
         </form>`;
-        const html = template.HTML(title, list, body, null);
+        const html = template.HTML(title, list, body, null, register.statusUI(req,res));
         res.send(html);
     })
 })
@@ -73,7 +74,7 @@ router.get('/update/:topic_id', (req,res) => {
                   <input type="submit"/>
                 </p>
             </form>`;
-        const html = template.HTML(title, list, body, null);
+        const html = template.HTML(title, list, body, null, register.statusUI(req,res));
         res.send(html);
     })
 })
@@ -105,7 +106,7 @@ router.get('/:topic_id', (req,res,next) => {
                     <input type="submit" value="delete"/>
                 </form>
             `;
-            const html = template.HTML(title, list, body, control);
+            const html = template.HTML(title, list, body, control, register.statusUI(req, res));
             res.send(html);
         }
     )

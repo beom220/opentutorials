@@ -1,5 +1,5 @@
 module.exports = {
-    HTML: (title, list, body, control, authStatusUI='<a href="/login">login</a>') => {
+    HTML: (title, list, body, control, authStatusUI) => {
         if(!control) control = '';
         if(!list) list = '';
         return `<!doctype html>

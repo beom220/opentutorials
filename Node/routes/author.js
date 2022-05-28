@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const db = require('../lib/db');
 const template = require('../lib/template');
+const register = require('../lib/register');
 const path = require("path");
 
 router.get('/create',(req, res,next) => {
@@ -27,7 +28,7 @@ router.get('/create',(req, res,next) => {
                 </p>
             </form>
         `
-        const html = template.HTML(title, list, body, null);
+        const html = template.HTML(title, list, body, null, register.statusUI(req,res));
         res.send(html);
     })
 });
@@ -80,7 +81,7 @@ router.get('/update/:author_id', (req,res, next)=>{
                         </p>
                     </form>
                 `;
-            const html = template.HTML(title, list, body, null);
+            const html = template.HTML(title, list, body, null, register.statusUI(req,res));
             res.send(html);
         })
     })
@@ -111,7 +112,7 @@ router.get('/',(req, res,next) => {
             ${template.authorTable(authors)}
             <a href="/author/create">create</a>
         `
-        const html = template.HTML(title, list, body, null);
+        const html = template.HTML(title, list, body, null, register.statusUI(req,res));
         res.send(html);
     })
 });
