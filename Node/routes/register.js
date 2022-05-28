@@ -2,41 +2,42 @@ const express = require('express');
 const router = express.Router();
 const db = require("../lib/db");
 const template = require("../lib/template");
-const path = require("path");
 
-router.get('/logout_process', (req,res,next)=> {
-    // 쿠키 정보 날림
-    res.cookie('name','', {maxAge: 0})
-        .cookie('profile','',{maxAge: 0});
-    res.redirect('/');
-
-});
-
+/* Note passport를 사용하면서 아래 기능을 대체
 router.post('/login_process', (req,res,next)=> {
     const post = req.body;
-    const name = post.name;
-    const profile = post.profile;
-
-    db.query(`SELECT * FROM author WHERE name=?`, [name], (err, author) => {
-        if(err) next(err);
-        if(profile !== author[0].profile){ // 여기서는 프로필이지만 패스워드임,
-            res.end('Wrong profile')
+    const email = post.email;
+    const password = post.password;
+    let chkEmail = [];
+    db.query(`SELECT email FROM author`, (err, emails) => {
+        if(err) throw err;
+        chkEmail = emails.filter(v => {
+            return v.email === email;
+        })
+        if(chkEmail.length === 0){
+            return res.end('EMAIL ERR');
         }
-        // 로그인 성공
-        res.cookie('name',name).cookie('profile',profile);
-        res.redirect('/');
+        if(chkEmail.length >= 1){
+            db.query(`SELECT password FROM author WHERE email=?`,[email], (err2, pwd) => {
+                if(err2) throw err2;
+                if(pwd[0].password !== password) return res.end('PWD ERR');
+                if(pwd[0].password === password) return res.redirect('/');
+            })
+        }
     })
 });
+ */
+
 
 router.get('/', (req,res,next)=> {
     const title = '로그인';
     const body = `
         <form action="/login/login_process" method="post">
             <p>
-                <input type="text" name="name" placeholder="name">
+                <input type="text" name="email" placeholder="email">
             </p>
             <p>
-                <input type="text" name="profile" placeholder="profile"/>
+                <input type="text" name="password" placeholder="password"/>
             </p>
             <p>
                 <input type="submit" value="login">
