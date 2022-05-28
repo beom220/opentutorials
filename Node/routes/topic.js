@@ -82,6 +82,7 @@ router.get('/update/:topic_id', (req,res) => {
 router.post('/delete_process', (req, res) => {
     const post = req.body;
     const id = post.id;
+
     db.query(`DELETE FROM topic WHERE id = ?`, [id], (error, result) => {
         if(error) throw error;
         res.redirect(302, `/`);
