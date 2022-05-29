@@ -41,7 +41,7 @@ app.get('*', (req, res, next) => {
 
 app.get('*', (req, res, next) => {
     // 모든 get 요청에 대해서 topic 테이블 저장
-    db.query(`SELECT *
+    db.query(`SELECT id, title
               FROM topic`, (error, topics) => {
         req.list = topics;
         next(); // 다음에 실행해야할 middleware 를 실행 할지 안할지 여부.
