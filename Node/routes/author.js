@@ -101,6 +101,7 @@ router.post('/delete_process', (req,res,next) => {
 })
 
 router.get('/',(req, res,next) => {
+    if(!req.user) return res.redirect('/');
     db.query(`SELECT * FROM author`, (error2, authors) => {
         if(error2) next(error2);
         const title = 'author';

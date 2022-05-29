@@ -6,6 +6,7 @@ const path = require("path");
 const register = require('../lib/register');
 
 router.get('/create', (req, res, next) => {
+    if(!req.user) return res.redirect('/');
     const title = 'Web - Create';
     const list = template.list(req.list);
     const body = `
@@ -15,7 +16,8 @@ router.get('/create', (req, res, next) => {
           <textarea name="description" placeholder="description"></textarea>
         </p>
         <p>
-            ${req.user ? `by ${req.user.name}` : ''}
+            <input type="hidden" name="auth" value="${req.user.id}">
+            <input type="text" value="${req.user.name}" readonly>
             <input type="submit"/>
         </p>
     </form>`;
@@ -53,6 +55,7 @@ router.post('/update_process', (req, res) => {
 })
 
 router.get('/update/:topic_id', (req, res) => {
+    if(!req.user) return res.redirect('/');
     const topicId = path.parse(req.params.topic_id).base;
     db.query(`SELECT *
               FROM topic
@@ -78,6 +81,7 @@ router.get('/update/:topic_id', (req, res) => {
 })
 
 router.post('/delete_process', (req, res) => {
+    if(!req.user) return res.redirect('/');
     const post = req.body;
     const id = post.id;
     db.query(`DELETE
@@ -90,20 +94,19 @@ router.post('/delete_process', (req, res) => {
 
 router.get('/:topic_id', (req, res, next) => {
     const topicId = path.parse(req.params.topic_id).base;
-
     db.query(`
-        SELECT topic.id, title, description, name 
+        SELECT topic.id, title, description, author.name
         FROM topic
         LEFT JOIN author 
         ON topic.author_id = author.id
         WHERE topic.id = ?`,
         [topicId], (error, topic) => {
             if (error) next(error);
-
             const {id, title, description, name} = topic[0];
             const list = template.list(req.list);
             const body = `<h2>${title}</h2><p>${description}</p><p>by ${name}</p>`;
             const control = `
+                
                 <a href="/topic/create">create</a> <a href="/topic/update/${id}">update</a>
                 <form action="/topic/delete_process" method="post">
                     <input type="hidden" name="id" value="${id}"/>
