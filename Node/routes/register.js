@@ -22,18 +22,25 @@ module.exports = (passport) => {
 
         db.query(`SELECT email FROM author`, (err, rows) => {
             if(err) throw err;
+
             const user = rows.filter(v => email === v.email);
             if(!!user.length) {
                 console.log('이미 쓰고있는 이메일');
                 return res.redirect('/login/create');
             }
-
             // Insert Into DB
             db.query(`INSERT INTO author (name, email, password, profile) VALUES (?, ?, ?, ?)`,
                 [name, email, password, profile],
                 (err2, row) => {
                     if(err2) throw err2;
-                    res.redirect(302, '/');
+
+                    // 가입된 정보로 login
+                    db.query(`SELECT * FROM author WHERE email=?`, [email], (err3, row)=>{
+                        if(err3) throw err3;
+                        req.login(row[0], (err)=>{
+                            return res.redirect('/')
+                        });
+                    })
                 }
             )
         })
