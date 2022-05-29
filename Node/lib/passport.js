@@ -1,5 +1,6 @@
 const passport = require("passport");
 const {Strategy: LocalStrategy} = require("passport-local");
+const bcrypt = require('bcrypt');
 
 module.exports = (app, db) => {
 //  03 Passport 불러오기
@@ -12,7 +13,7 @@ module.exports = (app, db) => {
     });
 //  07 페이지방문시 세션Store정보를 조회
     passport.deserializeUser((id, done) => {
-        db.query(`SELECT email, password, name FROM author WHERE email=?`, [id], (err, row)=> {
+        db.query(`SELECT email, password, name, id FROM author WHERE email=?`, [id], (err, row)=> {
             if(err) return done(null, false, {message : 'Sql Error'});
             done(null, row[0]);
         })
@@ -31,10 +32,12 @@ module.exports = (app, db) => {
                 // 일치하지 않다면 이메일 에러
                 if(!user) return done(null, false, {message : 'email error'});
 
-                db.query(`SELECT email, password FROM author WHERE email=?`, [email], (err2, row) => {
+                db.query(`SELECT email, password, id FROM author WHERE email=?`, [email], (err2, row) => {
                     if(err2) return done(null, false, {message : 'Sql Error'});
-                    if(password !== row[0].password) return done(null, false, {message: 'error pw'});
 
+                    // 비밀번호 비교, 일치 = true, 불일치 = false
+                    const exact = bcrypt.compareSync(password, row[0].password);
+                    if(!exact)  return done(null, false, {message: 'error pw'});
                     return done(null, row[0]);
                 })
             })

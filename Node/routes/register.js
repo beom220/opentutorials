@@ -3,13 +3,14 @@ const router = express.Router();
 const template = require("../lib/template");
 const register = require("../lib/register")
 const db = require("../lib/db");
+const bcrypt = require('bcrypt');
 
 
 module.exports = (passport) => {
     router.post('/create_process', (req,res)=>{
         const post = req.body;
-        const { name, email, password, password2, profile } = post;
-
+        const { name, email, profile } = post;
+        let {password, password2} = post;
         if(!name || !email || !password || !password2 || !profile){
             console.log('값이 없음');
             return res.redirect('/login/create');
@@ -19,6 +20,9 @@ module.exports = (passport) => {
             console.log('비밀번호1과 2가 다름');
             return res.redirect('/login/create');
         }
+
+        // 비밀번호 암호화
+        password = bcrypt.hashSync(password, 10);
 
         db.query(`SELECT email FROM author`, (err, rows) => {
             if(err) throw err;
