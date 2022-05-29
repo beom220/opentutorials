@@ -46,9 +46,7 @@ router.post('/create_process', (req,res)=>{
 
 router.post('/update_process', (req,res,next)=>{
     const post = req.body;
-    const id = post.id;
-    const name = post.name;
-    const profile = post.profile;
+    const {id, name, profile} = post;
 
     db.query(`UPDATE author SET name=?, profile=? WHERE id=?`, [name,profile,id], (err, result)=>{
         if(err) next(err);
@@ -58,6 +56,7 @@ router.post('/update_process', (req,res,next)=>{
 
 router.get('/update/:author_id', (req,res, next)=>{
     const authorId = path.parse(req.params.author_id).base;
+
     db.query(`SELECT * FROM author`, [authorId], (err, authors)=> {
         if(err) next(err);
         db.query(`SELECT * FROM author WHERE id = ?`, [authorId], (err2, author) => {
@@ -102,6 +101,7 @@ router.post('/delete_process', (req,res,next) => {
 })
 
 router.get('/',(req, res,next) => {
+    if(!req.user) return res.redirect('/');
     db.query(`SELECT * FROM author`, (error2, authors) => {
         if(error2) next(error2);
         const title = 'author';
