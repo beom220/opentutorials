@@ -4,9 +4,10 @@ module.exports = {
         if(!req.user) return false;
     },
     statusUI(req, res){
-        let authStatusUI = '<a href="/login">login</a>';
+        let authStatusUI = '<a href="/login">login</a> <a href="/login/create">register</a>';
         if(this.isOwner(req, res)){
-            authStatusUI = `${req.user.email} | <a href="/login/logout">logout</a>`
+            authStatusUI = `${req.user.name} | <a href="/login/logout">logout</a>`;
+            console.log(req.user);
         }
         return authStatusUI;
     }

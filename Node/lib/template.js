@@ -21,15 +21,6 @@ module.exports = {
     list: (topics) => {
         return `<ul>${topics?.map((topic) => `<li><a href="/topic/${topic.id}">${topic.title}</a></li>`).join('')}</ul>`;
     },
-    authorSelect : (authors, author_id) => {
-        let tag = '';
-        let selected = '';
-        authors.map((v, i)=>{
-            if(v === author_id) selected = ' selected';
-            tag += `<option value="${authors[i].id}" ${selected}>${authors[i].name}</option>`;
-        })
-        return `<select name="author">${tag}</select>`
-    },
     authorTable: (authors) => {
         let tag = '<table>';
         authors.map((author, i) => {
