@@ -51,7 +51,7 @@ app.get('*', (req, res, next) => {
 // routes
 // login
 const registerRouter = require('./routes/register')(passport);
-
+app.use('/login', registerRouter);
 // author
 app.use('/author', authorRouter);
 

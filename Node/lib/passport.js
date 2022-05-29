@@ -14,7 +14,7 @@ module.exports = (app, db) => {
 //  07 페이지방문시 세션Store정보를 조회
     passport.deserializeUser((id, done) => {
         // console.log('deserializeUser', id);
-        db.query(`SELECT email, password FROM author WHERE email=?`, [id], (err, row)=> {
+        db.query(`SELECT email, password, name FROM author WHERE email=?`, [id], (err, row)=> {
             if(err) return done(null, false, {message : 'Sql Error'});
             done(null, row[0]);
         })
@@ -34,7 +34,7 @@ module.exports = (app, db) => {
                 // 일치하지 않다면 이메일 에러
                 if(user.length === 0) return done(null, false, {message : 'email error'});
 
-                db.query(`SELECT email, password FROM author WHERE email=? AND password=?`, [username, password], (err2, row) => {
+                db.query(`SELECT email, password FROM author WHERE email=?`, [username], (err2, row) => {
                     if(err2) return done(null, false, {message : 'Sql Error'});
                     // console.log(row[0]);
                     if(password !== row[0].password) return done(null, false, {message: 'error pw'});
